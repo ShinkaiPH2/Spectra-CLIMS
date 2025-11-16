@@ -14,12 +14,12 @@ public final class DaoUtils {
     }
 
     public static Device mapDevice(ResultSet rs) throws SQLException {
-    /**
-     * Map the current row of a ResultSet to a Device model instance.
-     *
-     * @param rs ResultSet positioned at a valid row
-     * @return populated Device object
-     */
+        /**
+         * Map the current row of a ResultSet to a Device model instance.
+         *
+         * @param rs ResultSet positioned at a valid row
+         * @return populated Device object
+         */
         Device device = new Device();
         device.setId(rs.getInt("id"));
         device.setDeviceNumber(rs.getString("device_number"));
@@ -35,12 +35,12 @@ public final class DaoUtils {
     }
 
     public static User mapUser(ResultSet rs) throws SQLException {
-    /**
-     * Map the current row of a ResultSet to a User model instance.
-     *
-     * @param rs ResultSet positioned at a valid row
-     * @return populated User object
-     */
+        /**
+         * Map the current row of a ResultSet to a User model instance.
+         *
+         * @param rs ResultSet positioned at a valid row
+         * @return populated User object
+         */
         User user = new User();
         user.setId(rs.getInt("id"));
         user.setUsername(rs.getString("username"));
@@ -50,14 +50,14 @@ public final class DaoUtils {
     }
 
     public static String[] rowToArray(ResultSet rs, int cols) throws SQLException {
-    /**
-     * Convert the first {@code cols} columns of the current ResultSet row into
-     * a String array. Useful for simple table population code.
-     *
-     * @param rs   ResultSet positioned at a valid row
-     * @param cols number of columns to read
-     * @return array of String values from the row
-     */
+        /**
+         * Convert the first {@code cols} columns of the current ResultSet row into
+         * a String array. Useful for simple table population code.
+         *
+         * @param rs   ResultSet positioned at a valid row
+         * @param cols number of columns to read
+         * @return array of String values from the row
+         */
         String[] rowValues = new String[cols];
         for (int i = 0; i < cols; i++) {
             rowValues[i] = rs.getString(i + 1);
@@ -66,13 +66,13 @@ public final class DaoUtils {
     }
 
     public static void closeQuiet(AutoCloseable c) {
-    /**
-     * Close the given {@link AutoCloseable} quietly, ignoring any thrown exception.
-     * This is useful in cleanup paths where closing failures should not
-     * interrupt program flow.
-     *
-     * @param c resource to close (may be null)
-     */
+        /**
+         * Close the given {@link AutoCloseable} quietly, ignoring any thrown exception.
+         * This is useful in cleanup paths where closing failures should not
+         * interrupt program flow.
+         *
+         * @param c resource to close (may be null)
+         */
         if (c == null) {
             return;
         }

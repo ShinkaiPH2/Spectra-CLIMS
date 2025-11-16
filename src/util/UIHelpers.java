@@ -14,7 +14,8 @@ import java.awt.event.HierarchyListener;
  */
 public class UIHelpers {
     /**
-     * Default date/time formatter used across the UI for display (example: 11/16/2025 03:45:12 PM).
+     * Default date/time formatter used across the UI for display (example:
+     * 11/16/2025 03:45:12 PM).
      */
     public static final DateTimeFormatter DEFAULT_DTF = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a");
 
