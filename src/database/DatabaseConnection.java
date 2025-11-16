@@ -5,16 +5,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-
-    private static final String URL = "jdbc:sqlite:lib/database/CLIMS_Database.sqlite";
+    private static final String DB_URL = "jdbc:sqlite:lib/database/CLIMS_Database.sqlite";
 
     public static Connection connect() {
-        Connection conn = null;
+        Connection connection = null;
         try {
-            conn = DriverManager.getConnection(URL);
+            connection = DriverManager.getConnection(DB_URL);
         } catch (SQLException e) {
             System.err.println("Database connection failed: " + e.getMessage());
         }
-        return conn;
+        return connection;
     }
 }

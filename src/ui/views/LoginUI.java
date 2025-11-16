@@ -8,7 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class LoginUI extends JFrame {
     private JTextField usernameField;
@@ -21,6 +20,8 @@ public class LoginUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initComponents();
     }
+
+    private static final java.time.format.DateTimeFormatter LOGIN_DTF = java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a");
 
     private void initComponents() {
         // Create main panel with background
@@ -63,7 +64,7 @@ public class LoginUI extends JFrame {
         userLabel.setBounds(30, 110, 240, 20);
         loginBox.add(userLabel);
 
-        usernameField = new JTextField();
+    usernameField = new JTextField();
         usernameField.setBounds(30, 130, 240, 30);
         usernameField.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Color.LIGHT_GRAY),
@@ -84,20 +85,16 @@ public class LoginUI extends JFrame {
         loginBox.add(passwordField);
 
         // Login button
-        JButton loginBtn = new JButton("LOGIN");
+        JButton loginBtn = ui.UiUtils.makeButton("LOGIN", new Color(108, 117, 125));
         loginBtn.setBounds(30, 225, 105, 30);
-        loginBtn.setBackground(new Color(108, 117, 125));
         loginBtn.setForeground(Color.WHITE);
-        loginBtn.setFocusPainted(false);
-        loginBtn.addActionListener(this::onLogin);
+    loginBtn.addActionListener(this::onLogin);
         loginBox.add(loginBtn);
 
         // Exit button
-        JButton exitBtn = new JButton("EXIT");
+        JButton exitBtn = ui.UiUtils.makeButton("EXIT", new Color(220, 53, 69));
         exitBtn.setBounds(165, 225, 105, 30);
-        exitBtn.setBackground(new Color(220, 53, 69));
         exitBtn.setForeground(Color.WHITE);
-        exitBtn.setFocusPainted(false);
         exitBtn.addActionListener(e -> System.exit(0));
         loginBox.add(exitBtn);
 
@@ -109,16 +106,16 @@ public class LoginUI extends JFrame {
         String user = usernameField.getText().trim();
         String pass = new String(passwordField.getPassword());
 
-        User u = UserDAO.authenticate(user, pass);
-        if (u != null) {
-            // Log login
-            String ts = LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a"));
-            LogDAO.insertLoginLog(u.getId(), "<User> login", ts);
+        User authenticatedUser = UserDAO.authenticate(user, pass);
+        if (authenticatedUser != null) {
+            // Log login timestamp
+            String timestamp = LocalDateTime.now().format(LOGIN_DTF);
+            LogDAO.insertLoginLog(authenticatedUser.getId(), "<User> login", timestamp);
 
             // Open dashboard
             SwingUtilities.invokeLater(() -> {
-                DashboardUI dash = new DashboardUI(u);
-                dash.setVisible(true);
+                DashboardUI dashboard = new DashboardUI(authenticatedUser);
+                dashboard.setVisible(true);
                 this.dispose();
             });
         } else {

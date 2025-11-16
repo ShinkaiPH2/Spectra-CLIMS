@@ -29,6 +29,8 @@ public class ManageDevicesUI extends JFrame {
     private String[] statusFilters = null;
     private User currentUser;
     private JLabel timeLabel;
+    private static final String[] TABLE_COLUMNS = { "id", "Device Number", "Computer Parts", "Status", "Location",
+            "Functions" };
 
     public ManageDevicesUI(User currentUser) {
         this(currentUser, null);
@@ -58,7 +60,7 @@ public class ManageDevicesUI extends JFrame {
 
         // Top header
         timeLabel = new JLabel();
-        JPanel header = UIHelpers.createHeader("MANAGE DEVICES", timeLabel, new Color(188, 143, 107));
+        JPanel header = UIHelpers.createHeader("MANAGE DEVICES", timeLabel, new Color(238, 232, 170));
         mainContent.add(header, BorderLayout.NORTH);
 
         // Content panel
@@ -70,10 +72,8 @@ public class ManageDevicesUI extends JFrame {
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         actionPanel.setBackground(Color.WHITE);
 
-        JButton addButton = new JButton("ADD DEVICES");
-        addButton.setBackground(new Color(238, 232, 170));
+        JButton addButton = ui.UiUtils.makeButton("ADD DEVICES", new Color(238, 232, 170));
         addButton.setFont(new Font("Arial", Font.BOLD, 11));
-        addButton.setFocusPainted(false);
         addButton.addActionListener(e -> {
             DeviceFormDialog dlg = new DeviceFormDialog(this, null, currentUser);
             dlg.setVisible(true);
@@ -94,8 +94,7 @@ public class ManageDevicesUI extends JFrame {
         contentPanel.add(actionPanel, BorderLayout.NORTH);
 
         // Table
-        model = new DefaultTableModel(
-                new Object[] { "id", "Device Number", "Computer Parts", "Status", "Location", "Functions" }, 0) {
+        model = new DefaultTableModel(TABLE_COLUMNS, 0) {
             public boolean isCellEditable(int r, int c) {
                 return c == 5; // Only "Functions" column editable
             }
@@ -104,6 +103,7 @@ public class ManageDevicesUI extends JFrame {
         table = new JTable(model);
         table.setRowHeight(30);
         // Hide the ID column in the view but keep it in the model (used internally)
+        // Hide the ID column but keep it in the model for internal use
         table.getColumnModel().getColumn(0).setMinWidth(0);
         table.getColumnModel().getColumn(0).setMaxWidth(0);
         table.getColumnModel().getColumn(0).setPreferredWidth(0);

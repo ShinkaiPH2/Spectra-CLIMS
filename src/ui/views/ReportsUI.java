@@ -113,99 +113,96 @@ public class ReportsUI extends JFrame {
     }
 
     private JPanel buildActionPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
-
-        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        left.setBackground(Color.WHITE);
-        JButton back = new JButton("Back");
-        back.addActionListener(e -> centerCard.show(centerPanel, "MENU"));
-        left.add(back);
-        topPanel.add(left, BorderLayout.WEST);
-
-        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        right.setBackground(Color.WHITE);
-        right.add(new JLabel("Choose Date: mm/dd/yyyy"));
-        JTextField dateField = new JTextField(15);
-        right.add(dateField);
-        topPanel.add(right, BorderLayout.EAST);
-
-        panel.add(topPanel, BorderLayout.NORTH);
-
-        actionModel = new DefaultTableModel(new Object[] { "id", "Actions", "User", "Time" }, 0) {
-            public boolean isCellEditable(int r, int c) {
-                return false;
-            }
-        };
-        JTable table = new JTable(actionModel);
-        // wrap scrollpane to add padding around the table
-        JScrollPane actionScroll = new JScrollPane(table);
-        JPanel actionCenterWrap = new JPanel(new BorderLayout());
-        actionCenterWrap.setBackground(Color.WHITE);
-        actionCenterWrap.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
-        actionCenterWrap.add(actionScroll, BorderLayout.CENTER);
-        panel.add(actionCenterWrap, BorderLayout.CENTER);
-
+        JPanel panel = buildLogPanel("Actions", new String[] { "id", "Actions", "User", "Time" });
+        JScrollPane actionScroll = (JScrollPane) ((JPanel) panel.getComponent(1)).getComponent(0);
+        JTable actionTable = (JTable) actionScroll.getViewport().getView();
+        actionModel = (DefaultTableModel) actionTable.getModel();
+        // wire date field action (top panel's right textfield is index 1 in the right
+        // panel)
+        JTextField dateField = findDateField(panel);
         dateField.addActionListener(e -> {
-            String prefix = dateField.getText().trim();
-            if (prefix.isEmpty())
+            String datePrefix = dateField.getText().trim();
+            if (datePrefix.isEmpty()) {
                 refreshActionLogs();
-            else
-                refreshActionLogsByDate(prefix);
+            } else {
+                refreshActionLogsByDate(datePrefix);
+            }
         });
-
         return panel;
     }
 
     private JPanel buildLoginPanel() {
+        JPanel panel = buildLogPanel("Logs", new String[] { "id", "Logs", "User", "Time" });
+        JScrollPane loginScroll = (JScrollPane) ((JPanel) panel.getComponent(1)).getComponent(0);
+        JTable loginTable = (JTable) loginScroll.getViewport().getView();
+        loginModel = (DefaultTableModel) loginTable.getModel();
+        JTextField loginDateField = findDateField(panel);
+        loginDateField.addActionListener(e -> {
+            String datePrefix = loginDateField.getText().trim();
+            if (datePrefix.isEmpty()) {
+                refreshLoginLogs();
+            } else {
+                refreshLoginLogsByDate(datePrefix);
+            }
+        });
+        return panel;
+    }
+
+    // Helper: build a log view with a back button and a date field. Returns a panel
+    // where index 0 is top panel and index 1 is the center wrapper containing the
+    // scroll pane.
+    private JPanel buildLogPanel(String centerLabel, String[] columns) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
 
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
+        JPanel top = new JPanel(new BorderLayout());
+        top.setBackground(Color.WHITE);
 
         JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT));
         left.setBackground(Color.WHITE);
         JButton back = new JButton("Back");
         back.addActionListener(e -> centerCard.show(centerPanel, "MENU"));
         left.add(back);
-        topPanel.add(left, BorderLayout.WEST);
+        top.add(left, BorderLayout.WEST);
 
         JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         right.setBackground(Color.WHITE);
         right.add(new JLabel("Choose Date: mm/dd/yyyy"));
         JTextField dateField = new JTextField(15);
         right.add(dateField);
-        topPanel.add(right, BorderLayout.EAST);
+        top.add(right, BorderLayout.EAST);
 
-        panel.add(topPanel, BorderLayout.NORTH);
+        panel.add(top, BorderLayout.NORTH);
 
-        loginModel = new DefaultTableModel(new Object[] { "id", "Logs", "User", "Time" }, 0) {
+        DefaultTableModel tm = new DefaultTableModel(columns, 0) {
             public boolean isCellEditable(int r, int c) {
                 return false;
             }
         };
-        JTable table = new JTable(loginModel);
-        // wrap scrollpane to add padding around the table
-        JScrollPane loginScroll = new JScrollPane(table);
-        JPanel loginCenterWrap = new JPanel(new BorderLayout());
-        loginCenterWrap.setBackground(Color.WHITE);
-        loginCenterWrap.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
-        loginCenterWrap.add(loginScroll, BorderLayout.CENTER);
-        panel.add(loginCenterWrap, BorderLayout.CENTER);
-
-        dateField.addActionListener(e -> {
-            String prefix = dateField.getText().trim();
-            if (prefix.isEmpty())
-                refreshLoginLogs();
-            else
-                refreshLoginLogsByDate(prefix);
-        });
-
+        JTable table = new JTable(tm);
+        JScrollPane sp = new JScrollPane(table);
+        JPanel wrap = new JPanel(new BorderLayout());
+        wrap.setBackground(Color.WHITE);
+        wrap.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        wrap.add(sp, BorderLayout.CENTER);
+        panel.add(wrap, BorderLayout.CENTER);
         return panel;
+    }
+
+    // Find the date field placed on the top right of a log panel
+    private JTextField findDateField(JPanel logPanel) {
+        Component top = logPanel.getComponent(0);
+        if (top instanceof JPanel) {
+            JPanel topPanel = (JPanel) top;
+            Component right = ((BorderLayout) topPanel.getLayout()).getLayoutComponent(topPanel, BorderLayout.EAST);
+            if (right instanceof JPanel) {
+                for (Component c : ((JPanel) right).getComponents()) {
+                    if (c instanceof JTextField)
+                        return (JTextField) c;
+                }
+            }
+        }
+        return new JTextField(15); // fallback (shouldn't happen)
     }
 
     // Removed separate dialogs; both logs are shown inside the main frame tabs.

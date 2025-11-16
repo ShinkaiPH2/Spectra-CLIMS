@@ -78,7 +78,7 @@ public class DeviceFormDialog extends JDialog {
         costField = addField(p, "Cost:", 10, y);
         y += 40;
 
-        JButton save = new JButton(editing == null ? "Save" : "Update");
+        JButton save = ui.UiUtils.makeButton(editing == null ? "Save" : "Update", new Color(200, 200, 200));
         // position buttons differently when editing so we can show Delete
         if (editing == null) {
             save.setBounds(60, y, 100, 30);
@@ -89,19 +89,18 @@ public class DeviceFormDialog extends JDialog {
         p.add(save);
 
         if (editing != null) {
-            JButton delete = new JButton("Delete");
+            JButton delete = ui.UiUtils.makeButton("Delete", Color.RED);
             delete.setBounds(160, y, 100, 30);
-            delete.setBackground(Color.RED);
             delete.setForeground(Color.WHITE);
             delete.addActionListener(e -> onDelete());
             p.add(delete);
 
-            JButton cancel = new JButton("Cancel");
+            JButton cancel = ui.UiUtils.makeButton("Cancel", new Color(200, 200, 200));
             cancel.setBounds(280, y, 100, 30);
             cancel.addActionListener(e -> dispose());
             p.add(cancel);
         } else {
-            JButton cancel = new JButton("Cancel");
+            JButton cancel = ui.UiUtils.makeButton("Cancel", new Color(200, 200, 200));
             cancel.setBounds(200, y, 100, 30);
             cancel.addActionListener(e -> dispose());
             p.add(cancel);
@@ -162,11 +161,7 @@ public class DeviceFormDialog extends JDialog {
             d.setLocation((String) locationCombo.getSelectedItem());
             d.setNotes(notesArea.getText().trim());
             d.setPurchaseDate(purchaseDateField.getText().trim());
-            try {
-                d.setCost(Double.parseDouble(costField.getText().trim()));
-            } catch (Exception ex) {
-                d.setCost(0);
-            }
+            d.setCost(parseDoubleSafe(costField.getText().trim(), 0));
 
             boolean ok = DeviceDAO.insert(d);
             if (ok) {
@@ -191,11 +186,7 @@ public class DeviceFormDialog extends JDialog {
             editing.setLocation((String) locationCombo.getSelectedItem());
             editing.setNotes(notesArea.getText().trim());
             editing.setPurchaseDate(purchaseDateField.getText().trim());
-            try {
-                editing.setCost(Double.parseDouble(costField.getText().trim()));
-            } catch (Exception ex) {
-                editing.setCost(0);
-            }
+            editing.setCost(parseDoubleSafe(costField.getText().trim(), 0));
 
             boolean ok = DeviceDAO.update(editing);
             if (ok) {
@@ -211,6 +202,17 @@ public class DeviceFormDialog extends JDialog {
             } else {
                 JOptionPane.showMessageDialog(this, "Update failed");
             }
+        }
+    }
+
+    private double parseDoubleSafe(String text, double fallback) {
+        if (text == null || text.isEmpty()) {
+            return fallback;
+        }
+        try {
+            return Double.parseDouble(text);
+        } catch (NumberFormatException ex) {
+            return fallback;
         }
     }
 

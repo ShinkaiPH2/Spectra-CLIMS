@@ -45,10 +45,12 @@ public class DatabaseInit {
                     + "action_description TEXT,"
                     + "timestamp TEXT" + ");";
 
-            conn.createStatement().execute(usersTable);
-            conn.createStatement().execute(devicesTable);
-            conn.createStatement().execute(loginLogs);
-            conn.createStatement().execute(actionLogs);
+            try (java.sql.Statement stmt = conn.createStatement()) {
+                stmt.execute(usersTable);
+                stmt.execute(devicesTable);
+                stmt.execute(loginLogs);
+                stmt.execute(actionLogs);
+            }
 
             // Ensure a default admin user exists
             String checkAdmin = "SELECT id FROM users WHERE username = 'admin'";

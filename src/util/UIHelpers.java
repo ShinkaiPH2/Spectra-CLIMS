@@ -13,8 +13,20 @@ import java.awt.event.HierarchyListener;
  * Small UI helper utilities shared between multiple screens.
  */
 public class UIHelpers {
-    private static final DateTimeFormatter DEFAULT_DTF = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a");
+    /**
+     * Default date/time formatter used across the UI for display (example: 11/16/2025 03:45:12 PM).
+     */
+    public static final DateTimeFormatter DEFAULT_DTF = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a");
 
+    /**
+     * Create a simple header panel with a title on the left and a time label on the
+     * right.
+     *
+     * @param title     the header title text
+     * @param timeLabel a JLabel that will display the current time
+     * @param bgColor   background color of the header
+     * @return a configured header JPanel
+     */
     public static JPanel createHeader(String title, JLabel timeLabel, Color bgColor) {
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(bgColor);
@@ -30,6 +42,14 @@ public class UIHelpers {
         return header;
     }
 
+    /**
+     * Create an informational card panel used on the dashboard.
+     * The card contains a large count label (center) and a title (bottom).
+     *
+     * @param title   card title text
+     * @param bgColor background color for the card
+     * @return a configured card JPanel
+     */
     public static JPanel createCard(String title, Color bgColor) {
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(bgColor);
@@ -56,6 +76,13 @@ public class UIHelpers {
         return card;
     }
 
+    /**
+     * Start a one-second Swing Timer that updates the provided `timeLabel` with
+     * the current timestamp. The timer is stopped automatically when the
+     * top-level window containing the label is closed.
+     *
+     * @param timeLabel JLabel to update with the current date/time
+     */
     public static void startClock(JLabel timeLabel) {
         javax.swing.Timer t = new javax.swing.Timer(1000,
                 e -> timeLabel.setText(LocalDateTime.now().format(DEFAULT_DTF)));
@@ -64,42 +91,35 @@ public class UIHelpers {
 
         // Try to stop the timer when the top-level window is closed so the EDT
         // doesn't keep running due to active timers.
-        Window w = SwingUtilities.getWindowAncestor(timeLabel);
-        if (w != null) {
-            w.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    t.stop();
-                }
+        // Attach a listener on the top-level window to stop the timer when the
+        // window is closing/closed. If the label is not yet displayable, wait
+        // until it is and attach the listener then.
+        Runnable attachStopper = () -> {
+            Window window = SwingUtilities.getWindowAncestor(timeLabel);
+            if (window != null) {
+                window.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        t.stop();
+                    }
 
-                @Override
-                public void windowClosed(WindowEvent e) {
-                    t.stop();
-                }
-            });
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        t.stop();
+                    }
+                });
+            }
+        };
+
+        if (timeLabel.isDisplayable()) {
+            attachStopper.run();
         } else {
-            // If the component is not yet displayable, attach a HierarchyListener
-            // to wait until it's added to a window and then attach the listener.
             timeLabel.addHierarchyListener(new HierarchyListener() {
                 @Override
                 public void hierarchyChanged(HierarchyEvent e) {
                     if ((e.getChangeFlags() & HierarchyEvent.DISPLAYABILITY_CHANGED) != 0
                             && timeLabel.isDisplayable()) {
-                        Window win = SwingUtilities.getWindowAncestor(timeLabel);
-                        if (win != null) {
-                            win.addWindowListener(new WindowAdapter() {
-                                @Override
-                                public void windowClosing(WindowEvent e) {
-                                    t.stop();
-                                }
-
-                                @Override
-                                public void windowClosed(WindowEvent e) {
-                                    t.stop();
-                                }
-                            });
-                        }
-                        // Remove this listener after attaching
+                        attachStopper.run();
                         timeLabel.removeHierarchyListener(this);
                     }
                 }

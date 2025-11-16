@@ -53,6 +53,7 @@ public class DashboardUI extends JFrame {
         content.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
 
         GridBagConstraints gbc = new GridBagConstraints();
+
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
@@ -84,54 +85,28 @@ public class DashboardUI extends JFrame {
         repairedCountLbl = (JLabel) repairedCard.getComponent(0);
         content.add(repairedCard, gbc);
 
-        // Add click listeners to cards
-        allCard.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        allCard.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                new ManageDevicesUI(currentUser).setVisible(true);
-                dispose();
-            }
-        });
-
-        newCard.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        newCard.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                new ManageDevicesUI(currentUser, new String[] { "New" }).setVisible(true);
-            }
-        });
-
-        damagedCard.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        damagedCard.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                new ManageDevicesUI(currentUser, new String[] { "Broken", "Missing" }).setVisible(true);
-            }
-        });
-
-        repairedCard.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        repairedCard.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                new ManageDevicesUI(currentUser, new String[] { "Repaired" }).setVisible(true);
-            }
-        });
+        // Cards are informational only on the dashboard; clicking is disabled.
+        // Ensure default cursor so they don't appear clickable.
+        allCard.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        newCard.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        damagedCard.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        repairedCard.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
         return content;
     }
 
     private void refreshCounts() {
         // All stocked
-        int all = DeviceDAO.countAll();
-        allCountLbl.setText(String.valueOf(all));
+        int totalDevices = DeviceDAO.countAll();
+        allCountLbl.setText(String.valueOf(totalDevices));
 
-        // New Devices
-        int nw = DeviceDAO.countByStatus("new");
-        newCountLbl.setText(String.valueOf(nw));
+        int newDevicesCount = DeviceDAO.countByStatus("new");
+        newCountLbl.setText(String.valueOf(newDevicesCount));
 
-        // Damaged Devices (Broken or Missing)
-        int damaged = DeviceDAO.countByStatuses(new String[] { "broken", "missing" });
-        damagedCountLbl.setText(String.valueOf(damaged));
+        int damagedDevicesCount = DeviceDAO.countByStatuses(new String[] { "broken", "missing" });
+        damagedCountLbl.setText(String.valueOf(damagedDevicesCount));
 
-        // Repaired Devices
-        int repaired = DeviceDAO.countByStatus("repaired");
-        repairedCountLbl.setText(String.valueOf(repaired));
+        int repairedDevicesCount = DeviceDAO.countByStatus("repaired");
+        repairedCountLbl.setText(String.valueOf(repairedDevicesCount));
     }
 }

@@ -2,6 +2,7 @@ package ui.components;
 
 import dao.LogDAO;
 import model.User;
+import ui.UiUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -80,7 +81,7 @@ public class Sidebar extends JPanel {
         navPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Dashboard button
-        JButton dashboardBtn = createNavButton("DASHBOARD", new Color(255, 182, 193));
+        JButton dashboardBtn = UiUtils.makeNavButton("DASHBOARD", new Color(255, 182, 193));
         if ("DASHBOARD".equals(currentScreen)) {
             dashboardBtn.setEnabled(false);
         } else {
@@ -90,7 +91,7 @@ public class Sidebar extends JPanel {
         navPanel.add(Box.createVerticalStrut(5));
 
         // Manage Devices button
-        JButton manageBtn = createNavButton("MANAGE DEVICES", new Color(188, 143, 107));
+        JButton manageBtn = UiUtils.makeNavButton("MANAGE DEVICES", new Color(188, 143, 107));
         if ("MANAGE_DEVICES".equals(currentScreen)) {
             manageBtn.setEnabled(false);
         } else {
@@ -100,7 +101,7 @@ public class Sidebar extends JPanel {
         navPanel.add(Box.createVerticalStrut(5));
 
         // Reports button
-        JButton reportsBtn = createNavButton("REPORTS", new Color(238, 232, 170));
+        JButton reportsBtn = UiUtils.makeNavButton("REPORTS", new Color(238, 232, 170));
         if ("REPORTS".equals(currentScreen)) {
             reportsBtn.setEnabled(false);
         } else {
@@ -112,76 +113,47 @@ public class Sidebar extends JPanel {
     }
 
     private JPanel createBottomSection() {
-        JPanel bottomSection = new JPanel();
-        bottomSection.setLayout(new BoxLayout(bottomSection, BoxLayout.Y_AXIS));
-        bottomSection.setBackground(new Color(105, 105, 105));
-        bottomSection.setBorder(BorderFactory.createEmptyBorder(10, 10, 20, 10));
+        JPanel footerPanel = new JPanel();
+        footerPanel.setLayout(new BoxLayout(footerPanel, BoxLayout.Y_AXIS));
+        footerPanel.setBackground(new Color(105, 105, 105));
+        footerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 20, 10));
 
-        // Current user label
         JLabel userLabel = new JLabel("Current User: " + currentUser.getUsername());
         userLabel.setForeground(Color.WHITE);
         userLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        bottomSection.add(userLabel);
+        footerPanel.add(userLabel);
 
-        bottomSection.add(Box.createVerticalStrut(10));
+        footerPanel.add(Box.createVerticalStrut(10));
 
-        // Logout button
-        JButton logoutBtn = createNavButton("LOGOUT", new Color(80, 80, 80));
+        JButton logoutBtn = UiUtils.makeNavButton("LOGOUT", new Color(80, 80, 80));
         logoutBtn.addActionListener(e -> logout());
-        bottomSection.add(logoutBtn);
+        footerPanel.add(logoutBtn);
 
-        return bottomSection;
-    }
-
-    private JButton createNavButton(String text, Color bgColor) {
-        JButton btn = new JButton(text);
-        btn.setMaximumSize(new Dimension(260, 50));
-        btn.setPreferredSize(new Dimension(260, 50));
-        btn.setBackground(bgColor);
-        btn.setForeground(Color.BLACK);
-        btn.setFont(new Font("Arial", Font.BOLD, 12));
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
-        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        return btn;
+        return footerPanel;
     }
 
     // Navigation methods
     private void navigateToDashboard() {
-        SwingUtilities.invokeLater(() -> {
-            // preserve parent bounds/state so new frame keeps fullscreen if the parent was
-            // fullscreen
-            Rectangle bounds = parentFrame.getBounds();
-            int state = parentFrame.getExtendedState();
-            JFrame f = new ui.views.DashboardUI(currentUser);
-            // apply same size/state as parent
-            f.setBounds(bounds);
-            f.setExtendedState(state);
-            f.setVisible(true);
-            parentFrame.dispose();
-        });
+        openFrameAndCloseParent(() -> new ui.views.DashboardUI(currentUser));
     }
 
     private void navigateToManageDevices() {
-        SwingUtilities.invokeLater(() -> {
-            Rectangle bounds = parentFrame.getBounds();
-            int state = parentFrame.getExtendedState();
-            JFrame f = new ui.views.ManageDevicesUI(currentUser);
-            f.setBounds(bounds);
-            f.setExtendedState(state);
-            f.setVisible(true);
-            parentFrame.dispose();
-        });
+        openFrameAndCloseParent(() -> new ui.views.ManageDevicesUI(currentUser));
     }
 
     private void navigateToReports() {
+        openFrameAndCloseParent(() -> new ui.views.ReportsUI(currentUser));
+    }
+
+    // Helper to open a new frame and close the parent in the EDT
+    private void openFrameAndCloseParent(java.util.function.Supplier<JFrame> frameSupplier) {
         SwingUtilities.invokeLater(() -> {
             Rectangle bounds = parentFrame.getBounds();
             int state = parentFrame.getExtendedState();
-            JFrame f = new ui.views.ReportsUI(currentUser);
-            f.setBounds(bounds);
-            f.setExtendedState(state);
-            f.setVisible(true);
+            JFrame frame = frameSupplier.get();
+            frame.setBounds(bounds);
+            frame.setExtendedState(state);
+            frame.setVisible(true);
             parentFrame.dispose();
         });
     }
