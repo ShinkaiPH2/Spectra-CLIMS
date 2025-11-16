@@ -4,6 +4,14 @@ import model.User;
 
 public class UserDAO {
 
+    /**
+     * Authenticates a user by username and password.
+     *
+     * @param username the username of the user
+     * @param password the password of the user
+     * @return the User object if authentication is successful, null otherwise
+     */
+
     public static User authenticate(String username, String password) {
         String sql = "SELECT id,username,password,role FROM users WHERE username = ? AND password = ?";
         try (java.sql.Connection connection = database.DatabaseConnection.connect();
