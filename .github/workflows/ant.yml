@@ -12,14 +12,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: "21"
           distribution: "temurin"
+
       - name: Build with Ant
         run: ant -noinput -buildfile build.xml
 
@@ -30,3 +37,62 @@ jobs:
           path: |
             dist/Spectra_CLIMS.jar
             dist/lib/**
+
+      # create a deterministic tag for this run and push it
+      - id: create_tag
+        name: Create tag
+        run: |
+          TAG="v$(date +%Y%m%d)-${GITHUB_RUN_NUMBER}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"
+        shell: bash
+
+      # create a GitHub release for the tag
+      - id: create_release
+        name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ steps.create_tag.outputs.tag }}
+          release_name: ${{ steps.create_tag.outputs.tag }}
+          body: "Automated Ant build #${{ github.run_number }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # pack dist/lib into a single zip for upload
+      - name: Pack lib directory
+        run: |
+          if [ -d "dist/lib" ]; then
+            cd dist
+            zip -r lib.zip lib || true
+            cd -
+          else
+            echo "No dist/lib directory to pack"
+          fi
+
+      # upload main jar as release asset
+      - name: Upload Spectra_CLIMS.jar to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/Spectra_CLIMS.jar
+          asset_name: Spectra_CLIMS.jar
+          asset_content_type: application/java-archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # upload lib.zip if present
+      - name: Upload lib.zip to release
+        if: exists('dist/lib.zip') || always()
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/lib.zip
+          asset_name: lib.zip
+          asset_content_type: application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
