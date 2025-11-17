@@ -4,6 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * DatabaseConnection class to manage SQLite database connections.
+ */
+
 public class DatabaseConnection {
     private static final String DB_URL = "jdbc:sqlite:lib/database/CLIMS_Database.sqlite";
 

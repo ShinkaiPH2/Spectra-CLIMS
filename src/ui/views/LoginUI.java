@@ -9,6 +9,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDateTime;
 
+/*
+ * LoginUI class represents the login interface for the CLIMS application.
+ */
+
 public class LoginUI extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
@@ -21,8 +25,14 @@ public class LoginUI extends JFrame {
         initComponents();
     }
 
+    /*
+    * DateTimeFormatter for logging login timestamps.
+    */
     private static final java.time.format.DateTimeFormatter LOGIN_DTF = java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a");
 
+    /*
+    * Initializes UI components and layout.
+    */
     private void initComponents() {
         // Create main panel with background
         JPanel mainPanel = new JPanel() {
@@ -102,6 +112,9 @@ public class LoginUI extends JFrame {
         setContentPane(mainPanel);
     }
 
+    /*
+    * Handles login button action.
+    */
     private void onLogin(ActionEvent ev) {
         String user = usernameField.getText().trim();
         String pass = new String(passwordField.getPassword());

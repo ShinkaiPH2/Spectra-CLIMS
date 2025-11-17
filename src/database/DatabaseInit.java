@@ -10,6 +10,10 @@ import java.sql.SQLException;
  */
 public class DatabaseInit {
 
+    /**
+     * Initialize database schema and seed minimal data.
+     */
+
     public static void initialize() {
         try (Connection conn = DatabaseConnection.connect()) {
             if (conn == null)

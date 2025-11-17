@@ -8,10 +8,21 @@ import util.UIHelpers;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * DashboardUI represents the main dashboard view of the application.
+ * It displays key statistics about devices in a grid layout.
+ */
+
 public class DashboardUI extends JFrame {
     private User currentUser;
     private JLabel timeLabel;
     private JLabel allCountLbl, newCountLbl, damagedCountLbl, repairedCountLbl;
+
+    /**
+     * Constructs the DashboardUI with the specified user.
+     *
+     * @param user The current logged-in user.
+     */
 
     public DashboardUI(User user) {
         this.currentUser = user;
@@ -23,6 +34,10 @@ public class DashboardUI extends JFrame {
         UIHelpers.startClock(timeLabel);
         refreshCounts();
     }
+
+    /*
+    *   Initializes the UI components and layout.
+    */
 
     private void init() {
         setLayout(new BorderLayout());
@@ -46,6 +61,10 @@ public class DashboardUI extends JFrame {
 
         add(mainContent, BorderLayout.CENTER);
     }
+
+    /*
+    *   Creates the dashboard content with statistics cards.
+    */
 
     private JPanel createDashboardContent() {
         JPanel content = new JPanel(new GridBagLayout());
@@ -94,6 +113,10 @@ public class DashboardUI extends JFrame {
 
         return content;
     }
+
+    /*
+    *   Refreshes the counts displayed on the dashboard.
+    */
 
     private void refreshCounts() {
         // All stocked

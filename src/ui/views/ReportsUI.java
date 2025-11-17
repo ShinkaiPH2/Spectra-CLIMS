@@ -10,6 +10,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
+    /*
+    * ReportsUI class - main frame for viewing reports (login and action logs)
+    */
+
 public class ReportsUI extends JFrame {
     private DefaultTableModel loginModel;
     private DefaultTableModel actionModel;

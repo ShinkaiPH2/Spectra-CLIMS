@@ -21,6 +21,11 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * UI for managing devices in the CLIMS system.
+ * Allows users to view, add, edit, and search devices.
+ */
+
 public class ManageDevicesUI extends JFrame {
     private JTable table;
     private DefaultTableModel model;
@@ -32,10 +37,19 @@ public class ManageDevicesUI extends JFrame {
     private static final String[] TABLE_COLUMNS = { "id", "Device Number", "Computer Parts", "Status", "Location",
             "Functions" };
 
+    /*
+    *
+    */
     public ManageDevicesUI(User currentUser) {
         this(currentUser, null);
     }
 
+    /**
+     * Constructor for ManageDevicesUI.
+     *
+     * @param currentUser   The currently logged-in user.
+     * @param statusFilters Optional array of status filters to apply to the device list.
+     */
     public ManageDevicesUI(User currentUser, String[] statusFilters) {
         this.currentUser = currentUser;
         this.statusFilters = statusFilters;
@@ -47,6 +61,9 @@ public class ManageDevicesUI extends JFrame {
         UIHelpers.startClock(timeLabel);
     }
 
+    /*
+    * Initializes the UI components and layout.
+    */
     private void init() {
         setLayout(new BorderLayout());
 
@@ -191,6 +208,9 @@ public class ManageDevicesUI extends JFrame {
         });
     }
 
+    /*
+    * Refreshes the device list in the table.
+    */
     public void refresh() {
         model.setRowCount(0);
         List<Device> devices = DeviceDAO.getAll();
@@ -210,6 +230,9 @@ public class ManageDevicesUI extends JFrame {
         }
     }
 
+    /*
+    * Creates a RowFilter based on the provided status filters.
+    */
     private RowFilter<DefaultTableModel, Object> makeStatusRowFilter(String[] statuses) {
         if (statuses == null || statuses.length == 0)
             return null;

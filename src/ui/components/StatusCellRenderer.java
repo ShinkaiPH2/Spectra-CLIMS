@@ -7,6 +7,11 @@ import ui.UiUtils;
 
 import java.awt.*;
 
+/**
+ * A custom table cell renderer that changes the background color of the cell
+ * based on the status value it contains.
+ */
+
 public class StatusCellRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,

@@ -10,6 +10,10 @@ import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Dialog for adding/editing a device
+ */
+
 public class DeviceFormDialog extends JDialog {
     private JTextField deviceNumberField;
     private JComboBox<String> typeCombo;
@@ -25,6 +29,13 @@ public class DeviceFormDialog extends JDialog {
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a");
     private JTextArea notesArea;
 
+    /**
+     * Constructor
+     *
+     * @param owner       Parent frame
+     * @param d           Device to edit, or null to add new
+     * @param currentUser Current logged-in user for logging purposes
+     */
     public DeviceFormDialog(Frame owner, Device d, User currentUser) {
         super(owner, true);
         this.editing = d;
@@ -35,6 +46,7 @@ public class DeviceFormDialog extends JDialog {
         init();
     }
 
+    // Initialize UI components
     private void init() {
         JPanel p = new JPanel(null);
 
@@ -122,6 +134,10 @@ public class DeviceFormDialog extends JDialog {
         }
     }
 
+    /*
+    * Helper to add a labeled text field
+    */
+
     private JTextField addField(JPanel p, String label, int x, int y) {
         JLabel l = new JLabel(label);
         l.setBounds(x, y, 120, 25);
@@ -132,6 +148,9 @@ public class DeviceFormDialog extends JDialog {
         return f;
     }
 
+    /*
+    * Helper to add a labeled combo box
+    */
     private JComboBox<String> addCombo(JPanel p, String label, String[] items, int x, int y) {
         JLabel l = new JLabel(label);
         l.setBounds(x, y, 120, 25);
@@ -142,6 +161,10 @@ public class DeviceFormDialog extends JDialog {
         p.add(cb);
         return cb;
     }
+
+    /*
+    * Save button handler
+    */
 
     private void onSave() {
         // basic validation
@@ -205,6 +228,10 @@ public class DeviceFormDialog extends JDialog {
         }
     }
 
+    /*
+    * Safe double parser with fallback
+    */
+
     private double parseDoubleSafe(String text, double fallback) {
         if (text == null || text.isEmpty()) {
             return fallback;
@@ -215,6 +242,10 @@ public class DeviceFormDialog extends JDialog {
             return fallback;
         }
     }
+
+    /*
+    * Delete button handler
+    */
 
     private void onDelete() {
         if (editing == null)
