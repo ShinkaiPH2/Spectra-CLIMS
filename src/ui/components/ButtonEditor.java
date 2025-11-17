@@ -23,6 +23,15 @@ public class ButtonEditor extends DefaultCellEditor {
     private final JTable table;
     private final DefaultTableModel tableModel;
 
+    /**
+     * Create a ButtonEditor.
+     *
+     * @param parentUI    the parent ManageDevicesUI used to refresh the table after
+     *                    editing
+     * @param currentUser the currently logged-in user (passed to the edit dialog)
+     * @param table       the JTable this editor belongs to
+     * @param tableModel  the table model used to read the row id from column 0
+     */
     public ButtonEditor(ManageDevicesUI parentUI, User currentUser, JTable table, DefaultTableModel tableModel) {
         super(new JCheckBox()); // DefaultCellEditor requires a component
         this.parentUI = parentUI;
@@ -35,33 +44,31 @@ public class ButtonEditor extends DefaultCellEditor {
     }
 
     /**
-     * Create a ButtonEditor.
+     * Return the editor component (an Edit button) for the table cell.
+     * The actual edit action is triggered when editing stops and
+     * `getCellEditorValue()`
+     * is called.
      *
-     * @param parentUI    the parent `ManageDevicesUI` used to refresh the table
-     *                    after editing
-     * @param currentUser the currently logged-in user (passed to the edit dialog)
-     * @param table       the `JTable` this editor belongs to
-     * @param tableModel  the table model used to read the row id from column 0
+     * @param table      the table being edited
+     * @param value      the cell value (unused)
+     * @param isSelected true if the cell is selected in the UI
+     * @param row        the row index of the cell in view coordinates
+     * @param column     the column index of the cell in view coordinates
+     * @return the Edit button component to be shown inside the cell
      */
-
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         return editButton;
     }
 
     /**
-     * Return the editor component (an Edit button) for the table cell.
-     * The actual edit action is triggered when editing stops and
-     * `getCellEditorValue()` is called.
+     * Called when editing is finished. This method performs the edit action:
+     * it reads the device ID from the table model, opens the DeviceFormDialog
+     * to edit that device, and refreshes the parent UI after the dialog closes.
      *
-     * @param table      the table being edited
-     * @param value      the cell value (unused)
-     * @param isSelected whether the cell is selected
-     * @param row        the row index of the cell in view coordinates
-     * @param column     the column index of the cell in view coordinates
-     * @return the Edit button component
+     * @return an Object used by the table editor framework (not used by this
+     *         editor)
      */
-
     @Override
     public Object getCellEditorValue() {
         int viewRow = table.getSelectedRow();
@@ -88,13 +95,12 @@ public class ButtonEditor extends DefaultCellEditor {
     }
 
     /**
-     * Called when editing stops. This method looks up the device id from the
-     * table model, opens the edit dialog for that device, and schedules a
-     * refresh of the parent UI once the dialog closes.
+     * Safely parse an object into an int id. Returns -1 for null or
+     * non-numeric values to indicate an invalid id.
      *
-     * @return a placeholder value used by the table editor ("Edit")
+     * @param idObject the object to parse (often Integer or String)
+     * @return parsed int id or -1 if parsing failed
      */
-
     private int parseIdSafe(Object idObject) {
         if (idObject == null) {
             return -1;
@@ -105,12 +111,4 @@ public class ButtonEditor extends DefaultCellEditor {
             return -1;
         }
     }
-
-    /**
-     * Safely parse an object into an int id. Returns -1 for null or
-     * non-numeric values to indicate an invalid id.
-     *
-     * @param idObject the object to parse (often Integer or String)
-     * @return parsed int id or -1 if parsing failed
-     */
 }
