@@ -64,14 +64,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # pack dist/lib into a single zip for upload
-      - name: Pack lib directory
+      - id: pack
+        name: Pack lib directory
         run: |
           if [ -d "dist/lib" ]; then
             cd dist
             zip -r lib.zip lib || true
             cd -
+            echo "lib_present=true" >> $GITHUB_OUTPUT
           else
-            echo "No dist/lib directory to pack"
+            echo "lib_present=false" >> $GITHUB_OUTPUT
           fi
 
       # upload main jar as release asset
@@ -87,7 +89,7 @@ jobs:
 
       # upload lib.zip if present
       - name: Upload lib.zip to release
-        if: exists('dist/lib.zip') || always()
+        if: ${{ steps.pack.outputs.lib_present == 'true' }}
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
