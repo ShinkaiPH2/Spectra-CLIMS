@@ -71,11 +71,13 @@
 
     -->
     
-    <!-- === Copy the SQLite database after building the JAR === -->
+    <!-- === Copy the SQLite database and run wrapper after building the JAR === -->
 <target name="-post-jar">
     <copy todir="${dist.dir}/lib/database">
         <fileset dir="lib/database"/>
     </copy>
+    <!-- Copy run.bat (if present) to dist so double-click wrapper is included -->
+    <copy file="run.bat" todir="${dist.dir}" verbose="true" failonerror="false"/>
 </target>
 
 </project>
