@@ -30,3 +30,4 @@ jobs:
           path: |
             dist/Spectra_CLIMS.jar
             dist/lib/**
+            dist/run.bat
